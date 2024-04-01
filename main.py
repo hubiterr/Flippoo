@@ -324,7 +324,7 @@ async def main_group(client, msg):
             elif cmd[0] in ["говори", 'speak', 'спик', 'анмут']:
                 if msg.reply_to_message.from_user:
                     await unmute_user(client, chat_id, msg.reply_to_message.from_user.id)
-                    await msg.reply_text(f"Вы дали [Пользователю](tg://user?id={msg.reply_to_message.from_user.id}) возможность говорить!🌸")
+                    await msg.reply_text(f"Кляп вынут, но мы всегда можем продолжить😚")
                 else:
                     await msg.reply_text("Ответьте на чье то сообщение для анмута!🌸")
         if cmd[0] in ["/админы", '!админы']:
