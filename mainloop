@@ -1,0 +1,35 @@
+async def mainloop(cmd, client, msg, chat_id):
+    if cmd[0] in ['/set', 'set', 'сет'] and len(cmd) == 3:
+            if cmd[1] in ['td', "mutetime", "мут"]:
+                    if cmd[2].isdigit():
+                        global mute_delay
+                        mute_delay = int(cmd[2]) * 60
+                        await client.send_message(chat_id, f"Время мута при спаме установлено - {mute_delay//60} минут")
+                    else:
+                        await client.send_message(chat_id, "Укажите время в минутах! (число '5')")
+            elif cmd[0] == 'id':
+                await client.send_message(chat_id, f"{msg.from_user.id}")
+            elif cmd[0] == 'ban' and user[0]["rate"] >= 2:
+                if len(cmd) >= 1:
+                    reason = " ".join(cmd[1:])
+                else:
+                    reason = False
+                if msg.reply_to_message.from_user:
+                    if reason:
+                        await ban_member(client, chat_id, msg.reply_to_message.from_user.id, reason=reason)
+                    else:
+                        await ban_member(client, chat_id, msg.reply_to_message.from_user.id)
+                else:
+                    await client.send_message(chat_id, "Для бана необходимо ответить на сообщение пользователя!")
+            elif cmd[0] == 'unban' and user[0]['rate'] >= 2:
+                if len(cmd) >= 1:
+                    reason = " ".join(cmd[1:])
+                else:
+                    reason = False
+                if msg.reply_to_message.from_user:
+                    if reason:
+                        await unban_member(client, chat_id, msg.reply_to_message.from_user.id, reason=reason)
+                    else:
+                        await unban_member(client, chat_id, msg.reply_to_message.from_user.id)
+                else:
+                    await client.send_message(chat_id, "Для разблокировки необходимо ответить на сообщение пользователя!")

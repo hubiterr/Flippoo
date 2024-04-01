@@ -1,0 +1,26 @@
+{
+  "users": {
+    "1": {
+      "id": 6742445353,
+      "nick": "kwneko",
+      "name": "\uaa96\ud835\ude34\uaadd\uaab6\uaac0\uaa97",
+      "bdate": "",
+      "jdate": "17.03.2024 00:02",
+      "warns": 0,
+      "kicks": 0,
+      "karma": 0.5,
+      "rate": 5
+    },
+    "2": {
+      "id": 6112773300,
+      "nick": "sayyonarraa",
+      "name": "\u5342\u4e02\u5344\u3125\u4e47\u311a",
+      "bdate": "",
+      "jdate": "17.03.2024 09:59",
+      "warns": 0,
+      "kicks": 0,
+      "karma": 0.5,
+      "rate": 5
+    }
+  }
+}
