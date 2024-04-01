@@ -237,6 +237,9 @@ async def greet_new_members(client, msg):
 async def main_group(client, msg):
     if not msg or msg.from_user.is_bot:
         return
+    
+    if not str(msg.chat.id) == cfg.get('SETTING', 'main'):
+        return
     chat_id = msg.chat.id
     cmd = msg.text.lower().split(" ")
     user = MAIN.get_user_data(msg.from_user.id)
