@@ -214,10 +214,8 @@ async def check_banwords(client, msg):
 
     with open('banwords.txt', 'r', encoding='utf-8') as words:
         words = words.readlines()
-        print(words)
         for word in words:
             if msg.text.lower() == word.replace('\n', ''):
-                print(msg.text)
                 await mute_user(client, chat_id, user_id, 500)
                 await msg.reply_text('Твой ротик создан для лучшего 😘')
 
@@ -369,6 +367,8 @@ async def main_group(client, msg):
             await msg.reply_text('ПОНГ!🌸')
 
     await check_banwords(client, msg)
+
+    print(msg.text, msg.from_user.first_name)
 
 @app.on_message(filters.private)
 async def main_private(client, msg):
