@@ -250,7 +250,7 @@ async def greet_new_members(client, msg):
     if msg.from_user.is_bot:
         return
     if user:
-        await msg.reply_text(f"Приветствую тебя в <b>{msg.chat.title}</b>!\nКажется я тебя видела раньше в этом чате, с возвращением^^\nПожалуйста, ознакомься с <a href='{rules}'>правилами чата</a> ^^")
+        await msg.reply_text(f"Приветствую тебя в <b>{msg.chat.title}</b>!\nКажется я тебя видел раньше в этом чате, с возвращением^^\nПожалуйста, ознакомься с <a href='{rules}'>правилами чата</a> ^^")
     else:
         await msg.reply_text(f"Приветствую тебя в <b>{msg.chat.title}</b>!\nПожалуйста, ознакомься с <a href='{rules}'>правилами чата</a> ^^")
 
