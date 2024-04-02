@@ -262,9 +262,7 @@ async def main_group(client, msg):
 
     if not msg or msg.from_user.is_bot:
         return
-    mcc = False
-    if str(msg.chat.id) == cfg.get('SETTING', 'main'):
-        mcc = True
+    mcc = True
 
     print(mcc)
 
