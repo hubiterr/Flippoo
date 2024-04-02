@@ -219,6 +219,17 @@ async def check_banwords(client, msg):
                 await mute_user(client, chat_id, user_id, 500)
                 await msg.reply_text('Твой ротик создан для лучшего 😘')
 
+async def check_amd(chat_id, user_id):
+    admins, owner = await get_admin_members(chat_id)
+
+    for admin in admins:
+        if user_id == admin.user.id:
+            return True
+    if user_id == owner[0].user.id:
+        return True
+    
+    return False
+
 # ___       __   _______   ___       ________  ________  _____ ______   _______      
 #|\  \     |\  \|\  ___ \ |\  \     |\   ____\|\   __  \|\   _ \  _   \|\  ___ \     
 #\ \  \    \ \  \ \   __/|\ \  \    \ \  \___|\ \  \|\  \ \  \\\__\ \  \ \   __/|    
@@ -246,11 +257,18 @@ async def greet_new_members(client, msg):
 #     \|__|     \|__|\|__|\|__|\|__|\|__| \|__|        \|_______|\|_______|\|_______|\|__|                                                                           
 @app.on_message(filters.group)
 async def main_group(client, msg):
+
+    print(msg.text)
+
     if not msg or msg.from_user.is_bot:
         return
+    mcc = False
+    if str(msg.chat.id) == cfg.get('SETTING', 'main'):
+        mcc = True
+
+    print(mcc)
+
     
-    if not str(msg.chat.id) == cfg.get('SETTING', 'main'):
-        return
     chat_id = msg.chat.id
     cmd = msg.text.lower().split(" ")
     user = MAIN.get_user_data(msg.from_user.id)
@@ -262,28 +280,29 @@ async def main_group(client, msg):
             bdate = "", 
             jdate = await cur_date(),
         )
-    else:
-        if user[0]['rate'] >= 2:
-            if cmd[0] in ['/set', 'set', 'сет'] and len(cmd) >= 2:
-                if cmd[1] in ['td', "mutetime", "мут"]:
+
+
+    if await check_amd(chat_id, msg.from_user.id):
+        if cmd[0] in ['/set', 'set', 'сет'] and len(cmd) >= 2:
+            if cmd[1] in ['td', "mutetime", "мут"]:
                     if cmd[2].isdigit():
                         global mute_delay
                         mute_delay = int(cmd[2]) * 60
                         await client.send_message(chat_id, f"Теперь болтуны работают ротиком {mute_delay//60} минут 😈")
                     else:
                         await client.send_message(chat_id, "Хозяин! Я вас не понимаю, напишите время в минутах! (к примеру 5 минут)")
-                elif cmd[1] in ["devchat", "закулисье"]:
+            elif cmd[1] in ["devchat", "закулисье"]:
                     cfg.set('SETTING', 'dev', str(msg.chat.id))
-                    await msg.reply_text("Отлично! Я запомнила чатик модераторов!")
+                    await msg.reply_text("Отлично! Я запомнил чатик модераторов!")
                     await upd_cfg(cfg)
-                elif cmd[1] in ["mainchat", "основа"]:
+            elif cmd[1] in ["mainchat", "основа"]:
                     cfg.set('SETTING', 'main', str(msg.chat.id))
-                    await msg.reply_text("Хорошо! Я запомнила чатик Сообщества")
+                    await msg.reply_text("Хорошо! Я запомнил чатик Сообщества")
                     await upd_cfg(cfg)
-            elif cmd[0] in ['id', "ид"]:
+        elif cmd[0] in ['id', "ид"]:
                 await client.send_message(chat_id, f"Ваш айди - <code>{msg.from_user.id}</code>")
                 await client.send_message(chat_id, f"Чат айди - <code>{msg.chat.id}</code>")           
-            elif cmd[0] in ['ban', "бан"]:
+        elif cmd[0] in ['ban', "бан"]:
                 if len(cmd) >= 1:
                     reason = " ".join(cmd[1:])
                 else:
@@ -295,7 +314,7 @@ async def main_group(client, msg):
                         await ban_member(client, chat_id, msg.reply_to_message.from_user.id)
                 else:
                     await client.send_message(chat_id, "Чтобы выгнать плохиша необходимо ответить на его сообщение!")
-            elif cmd[0] in ['unban', 'анбан']:
+        elif cmd[0] in ['unban', 'анбан']:
                 if len(cmd) >= 1:
                     reason = " ".join(cmd[1:])
                 else:
@@ -307,7 +326,7 @@ async def main_group(client, msg):
                         await unban_member(client, chat_id, msg.reply_to_message.from_user.id)
                 else:
                     await client.send_message(chat_id, "Чтобы простить солнышку необходимо ответить на его сообщение!")
-            elif cmd[0] in ["мут", 'mute']:
+        elif cmd[0] in ["мут", 'mute']:
                 if msg.reply_to_message.from_user:
                     if len(cmd) == 2:
                         if cmd[1].isdigit():
@@ -321,25 +340,24 @@ async def main_group(client, msg):
                         await msg.reply_text(f"У [Лисенка](tg://user?id={msg.reply_to_message.from_user.id}) ротик будет занят {round(mute_delay/60, 1)} минут\nНе мешайте лисенку думать над поведением)")
                 else:
                     await msg.reply_text("Ответьте на чье то сообщение чтобы он подумал над поведением! >.<")
-            elif cmd[0] in ["говори", 'speak', 'спик', 'анмут']:
-                if msg.reply_to_message.from_user:
-                    await unmute_user(client, chat_id, msg.reply_to_message.from_user.id)
-                    await msg.reply_text(f"Кляп вынут, но мы всегда можем продолжить😚")
-                else:
-                    await msg.reply_text("Ответьте на чье то сообщение для анмута!🌸")
-        if cmd[0] in ["/админы", '!админы']:
-            admin_members, owner = await get_admin_members(chat_id)
-            text = "\nГлава🌸\n"
-            for own in owner:
-                us = f"{own.user.first_name} {own.user.last_name if own.user.last_name else ''}"
-                text += f"[{us}](tg://user?id={own.user.id})\n"
-            text += "\nМодераторы Чата🌸\n"
-            for admin in admin_members:
-                us = f"{admin.user.first_name} {admin.user.last_name if admin.user.last_name else ''}"
-                text += f"[{us}](tg://user?id={admin.user.id})\n"
-
-            await client.send_message(chat_id, text)
-        elif cmd[0] in ["рапорт", "репорт", "report", 'raport'] and str(msg.chat.id) == cfg.get('SETTING', 'main'):
+        elif cmd[0] in ["говори", 'speak', 'спик', 'анмут']:
+            if msg.reply_to_message.from_user:
+                await unmute_user(client, chat_id, msg.reply_to_message.from_user.id)
+                await msg.reply_text(f"Кляп вынут, но мы всегда можем продолжить😚")
+            else:
+                await msg.reply_text("Ответьте на чье то сообщение для анмута!🌸")
+    elif cmd[0] in ["/админы", '!админы'] and mcc:
+        admin_members, owner = await get_admin_members(chat_id)
+        text = "\nГлава🌸\n"
+        for own in owner:
+            us = f"{own.user.first_name} {own.user.last_name if own.user.last_name else ''}"
+            text += f"[{us}](tg://user?id={own.user.id})\n"
+        text += "\nМодераторы Чата🌸\n"
+        for admin in admin_members:
+            us = f"{admin.user.first_name} {admin.user.last_name if admin.user.last_name else ''}"
+            text += f"[{us}](tg://user?id={admin.user.id})\n"
+        await client.send_message(chat_id, text)
+    elif cmd[0] in ["рапорт", "репорт", "report", 'raport'] and str(msg.chat.id) == cfg.get('SETTING', 'main') and mcc:
             if msg.reply_to_message:
                 try:
                     if global_cfg[msg.reply_to_message.from_user.id]['rt'] >= 1:
@@ -363,8 +381,8 @@ async def main_group(client, msg):
                 await client.send_message(chat_id, 'Виновник уже в центре внимания модеров!)) 📛')
             else:
                 await client.send_message(chat_id, "Необходимо ответить на чье либо сообщение для репорта📛")
-        elif cmd[0] == 'пинг':
-            await msg.reply_text('ПОНГ!🌸')
+    elif cmd[0] == 'пинг':
+        await msg.reply_text('ПОНГ!🌸')
 
     await check_banwords(client, msg)
 
