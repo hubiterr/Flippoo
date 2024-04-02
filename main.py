@@ -262,11 +262,7 @@ async def main_group(client, msg):
 
     if not msg or msg.from_user.is_bot:
         return
-    mcc = True
 
-    print(mcc)
-
-    
     chat_id = msg.chat.id
     cmd = msg.text.lower().split(" ")
     user = MAIN.get_user_data(msg.from_user.id)
@@ -344,7 +340,8 @@ async def main_group(client, msg):
                 await msg.reply_text(f"Кляп вынут, но мы всегда можем продолжить😚")
             else:
                 await msg.reply_text("Ответьте на чье то сообщение для анмута!🌸")
-    elif cmd[0] in ["/админы", '!админы'] and mcc:
+    
+    if cmd[0] in ["/админы", '!админы']:
         admin_members, owner = await get_admin_members(chat_id)
         text = "\nГлава🌸\n"
         for own in owner:
@@ -355,7 +352,7 @@ async def main_group(client, msg):
             us = f"{admin.user.first_name} {admin.user.last_name if admin.user.last_name else ''}"
             text += f"[{us}](tg://user?id={admin.user.id})\n"
         await client.send_message(chat_id, text)
-    elif cmd[0] in ["рапорт", "репорт", "report", 'raport'] and str(msg.chat.id) == cfg.get('SETTING', 'main') and mcc:
+    elif cmd[0] in ["рапорт", "репорт", "report", 'raport'] and str(msg.chat.id) == cfg.get('SETTING', 'main'):
             if msg.reply_to_message:
                 try:
                     if global_cfg[msg.reply_to_message.from_user.id]['rt'] >= 1:
