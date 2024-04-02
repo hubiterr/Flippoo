@@ -6,8 +6,8 @@ from datetime import datetime, timedelta
 import asyncio
 import configparser as cp
 from crud import *
-from icecream import ic
-
+import threading
+import time
 
 
 #  ________  _________  ________  ________  _________   
@@ -74,18 +74,24 @@ async def handle_media_spam(client, msg, spam_dict, media_type):
         spam_dict[user_id] += 1
     else:
         spam_dict[user_id] = 1
-
-    if spam_dict[user_id] > 3:
+    if spam_dict[user_id] > 4:
         try:
             until_date = (datetime.now() + timedelta(seconds=mute_delay)).replace(microsecond=0)
             await client.restrict_chat_member(msg.chat.id, user_id, permissions=types.ChatPermissions(), until_date=until_date)
             await msg.reply(f"Ваша покорность поразила нас. Вы отправили слишком много {media_type} за раз и вам придется отдохнуть на {mute_delay//60} минут")
-            spam_dict[user_id] = 0
+            spam_dict[user_id] = 1
         except:
             await msg.reply("Твои админские или модераторские права не оправдывают спам!!! 🙅‍♂️")
-            spam_dict[user_id] = 0
-
+            spam_dict[user_id] = 1
     await asyncio.sleep(1)
+
+def clear_spam():
+    while True:
+        for us, _ in gif_spam.items():
+            gif_spam[us] = 1
+        for us, _ in sticker_spam.items():
+            sticker_spam[us] = 1
+        time.sleep(2)
 
 # градация увеличения мута за спам
 async def nmap(decimal):
@@ -432,6 +438,8 @@ async def callback_query(client, query):
 if __name__ == "__main__":                                                               
     print("Start bot!")
     try:
+        thread = threading.Thread(target=clear_spam)
+        thread.start()
         app.run()
     except KeyboardInterrupt as e:
         print(e)
